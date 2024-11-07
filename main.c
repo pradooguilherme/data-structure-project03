@@ -23,8 +23,8 @@ typedef struct
 
 #define PAGESIZE sizeof(BTPAGE)
 
-short root; // rrn of root page
-FILE *btfd; // file descriptor of btree file
+short root;
+FILE *btfd;
 
 FILE *iniciaLogFile()
 {
@@ -90,24 +90,20 @@ void printBTPAGE(BTPAGE *page_ptr)
 {
     printf("------------------------------------ PAGINA -------------------------------\n");
 
-    // Imprime o número de chaves
     printf("Key Count: %d\n", page_ptr->keycount);
 
-    // Imprime as chaves
     printf("Keys:\n");
     for (int i = 0; i < 3; i++)
     {
         printf("Key %d: %s\n", i, page_ptr->key[i]);
     }
 
-    // Imprime os ponteiros para descendentes
     printf("Child Pointers:\n");
     for (int i = 0; i <= 3; i++)
     {
         printf("Child %d: %d\n", i, page_ptr->child[i]);
     }
 
-    // Imprime os deslocamentos em bytes
     printf("Byte Offsets:\n");
     for (int i = 0; i < 3; i++)
     {
@@ -227,7 +223,6 @@ void btread(short rrn, BTPAGE *page_ptr)
         return;
     }
 
-    // Lendo as chaves (key) - assume-se que MAXKEYS <= 3
     for (int i = 0; i < 3; i++)
     {
         if (fread(page_ptr->key[i], sizeof(char), 7, btfd) != 7)
@@ -237,23 +232,17 @@ void btread(short rrn, BTPAGE *page_ptr)
         }
     }
 
-    // Lendo os ponteiros para os filhos
     if (fread(page_ptr->child, sizeof(short), MAXKEYS + 1, btfd) != (MAXKEYS + 1))
     {
         perror("Erro ao ler child");
         return;
     }
 
-    // Lendo os offsets dos bytes
     if (fread(page_ptr->byteofset, sizeof(short), MAXKEYS, btfd) != MAXKEYS)
     {
         perror("Erro ao ler byteofset");
         return;
     }
-
-    // printf("Essa foi a página lida antes da inserção\n");
-
-    // printBTPAGE(page_ptr);
 }
 
 int search_node(char key[7], BTPAGE *p_page, short *pos)
